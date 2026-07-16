@@ -15,6 +15,8 @@ from database.database import engine, Base
 from api.upload import router as upload_router
 from api.chat import router as chat_router
 from api.reports import router as reports_router
+from api.auth import router as auth_router
+from api.users import router as users_router
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +43,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 # Register routers
+app.include_router(auth_router)
+app.include_router(users_router)
 app.include_router(upload_router)
 app.include_router(chat_router)
 app.include_router(reports_router)

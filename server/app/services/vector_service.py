@@ -47,3 +47,16 @@ def index_document(document_id: int, filename: str, text: str) -> bool:
     except Exception as e:
         logger.error(f"Failed to index document {document_id} in Chroma: {str(e)}", exc_info=True)
         return False
+
+def delete_document_from_chroma(document_id: int) -> bool:
+    """
+    Deletes all indexed chunks for a given document_id from ChromaDB.
+    """
+    try:
+        collection = get_chroma_collection()
+        collection.delete(where={"document_id": document_id})
+        logger.info(f"Successfully deleted document {document_id} chunks from ChromaDB")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to delete document {document_id} chunks from ChromaDB: {str(e)}", exc_info=True)
+        return False

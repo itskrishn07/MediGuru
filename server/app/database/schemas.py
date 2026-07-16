@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 from datetime import datetime
 
@@ -31,6 +31,7 @@ class MedicalExtraction(BaseModel):
 
 class DocumentResponse(BaseModel):
     id: int
+    user_id: Optional[int] = None
     filename: str
     file_path: str
     extracted_text: Optional[str] = None
@@ -45,3 +46,67 @@ class DocumentResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+# --- Authentication & User Schemas ---
+import re
+
+EMAIL_REGEX = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+
+class UserCreate(BaseModel):
+    email: str = Field(..., description="The user's email address")
+    password: str = Field(..., description="The user's password")
+    full_name: str = Field(..., description="The user's full name")
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        v = v.strip().lower()
+        if not re.match(EMAIL_REGEX, v):
+            raise ValueError("Invalid email format")
+        return v
+
+    @field_validator("password")
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters long")
+        if not any(char.isupper() for char in v):
+            raise ValueError("Password must contain at least one uppercase letter")
+        if not any(char.islower() for char in v):
+            raise ValueError("Password must contain at least one lowercase letter")
+        if not any(char.isdigit() for char in v):
+            raise ValueError("Password must contain at least one digit")
+        # Support common special characters
+        special_chars = set("!@#$%^&*()-_=+[]{}|;:',.<>?/`~")
+        if not any(char in special_chars for char in v):
+            raise ValueError("Password must contain at least one special character")
+        return v
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    full_name: str
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {
+        "from_attributes": True
+    }
+
+class LoginRequest(BaseModel):
+    email: str = Field(..., description="The user's registered email address")
+    password: str = Field(..., description="The user's password")
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        return v.strip().lower()
+
+class Token(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+class TokenData(BaseModel):
+    user_id: Optional[int] = None
+

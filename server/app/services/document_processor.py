@@ -12,7 +12,7 @@ from core.constants import SUPPORTED_IMAGE_EXTENSIONS, SUPPORTED_PDF_EXTENSIONS
 
 logger = logging.getLogger(__name__)
 
-def process_document(db: Session, file_path: Path, content_type: str) -> dict:
+def process_document(db: Session, file_path: Path, content_type: str, user_id: int) -> dict:
     """
     Orchestrates the entire document processing pipeline:
     1. Determines file type (PDF vs Image).
@@ -74,7 +74,8 @@ def process_document(db: Session, file_path: Path, content_type: str) -> dict:
                 filename=file_path.name,
                 file_path=str(file_path),
                 extracted_text=extracted_text,
-                extraction=extracted_data
+                extraction=extracted_data,
+                user_id=user_id
             )
             logger.info(f"Successfully saved document in DB. ID: {db_document.id}")
         except Exception as db_err:

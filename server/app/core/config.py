@@ -22,6 +22,12 @@ class Settings:
     # Database
     DATABASE_URL: str = os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/mediguru")
     
+    # Security & JWT
+    JWT_SECRET: str = os.environ.get("JWT_SECRET", "9f82d1c68f12a34b2e67c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9")
+    JWT_ALGORITHM: str = os.environ.get("JWT_ALGORITHM", "HS256")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
+
     # OCR Flags
     USE_MKLDNN: str = os.environ.get("FLAGS_use_mkldnn", "0")
 

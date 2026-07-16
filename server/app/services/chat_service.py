@@ -7,13 +7,13 @@ from .retrieval_service import retrieve_relevant_chunks
 
 logger = logging.getLogger(__name__)
 
-def chat_with_records(query: str, document_id: int | None = None) -> str:
+def chat_with_records(query: str, document_ids: list[int] | None = None) -> str:
     """
     Answers a patient's question based on context retrieved from their medical records.
     """
     try:
         # 1. Retrieve context
-        chunks = retrieve_relevant_chunks(query, n_results=4, document_id=document_id)
+        chunks = retrieve_relevant_chunks(query, n_results=4, document_ids=document_ids)
         context_text = "\n\n".join([f"--- Chunk from {c['metadata'].get('filename')} ---\n{c['text']}" for c in chunks])
         
         if not context_text:

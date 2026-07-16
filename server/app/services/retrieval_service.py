@@ -4,18 +4,26 @@ from .embedding_service import embed_text
 
 logger = logging.getLogger(__name__)
 
-def retrieve_relevant_chunks(query: str, n_results: int = 5, document_id: int | None = None) -> list[dict]:
+def retrieve_relevant_chunks(query: str, n_results: int = 5, document_ids: list[int] | None = None) -> list[dict]:
     """
-    Retrieves the most similar chunks from ChromaDB for a given search query.
+    Retrieves the most similar chunks from ChromaDB for a given search query,
+    scoped optionally to a list of allowed document_ids.
     """
     try:
         # 1. Embed query
         query_embedding = embed_text(query)
         
-        # 2. Prepare filter if document_id is provided
+        # 2. Prepare filter if document_ids is provided
         where_filter = None
-        if document_id is not None:
-            where_filter = {"document_id": document_id}
+        if document_ids is not None:
+            if len(document_ids) == 1:
+                where_filter = {"document_id": document_ids[0]}
+            elif len(document_ids) > 1:
+                where_filter = {"document_id": {"$in": document_ids}}
+            else:
+                # Empty list: match nothing to avoid leaking data
+                logger.warning("Empty document_ids list passed. Returning empty context.")
+                return []
             
         # 3. Query Chroma
         collection = get_chroma_collection()

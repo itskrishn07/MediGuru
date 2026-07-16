@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 
 from core.config import settings
 from database.database import get_db
+from database.models import UserORM
+from api.dependencies import get_current_user
 from services.document_processor import process_document
 
 router = APIRouter(prefix="/upload", tags=["Upload"])
@@ -15,7 +17,11 @@ UPLOAD_DIR = settings.UPLOAD_DIR
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 @router.post("")
-async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def upload_file(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: UserORM = Depends(get_current_user)
+):
     # Extract only the base name to prevent path traversal vulnerability
     filename = Path(file.filename).name
     if not filename or filename in (".", ".."):
@@ -42,7 +48,7 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
     file_size = file_path.stat().st_size
 
     # Orchestrate extraction and analysis
-    result = process_document(db, file_path, file.content_type)
+    result = process_document(db, file_path, file.content_type, user_id=current_user.id)
 
     return {
         "document_id": result.get("document_id"),
