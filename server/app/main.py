@@ -39,8 +39,19 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to initialize PaddleOCR models on startup: {str(e)}", exc_info=True)
     yield
 
+from fastapi.middleware.cors import CORSMiddleware
+
 # Initialize the application instance
 app = FastAPI(lifespan=lifespan)
+
+# Enable CORS for frontend development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Register routers
 app.include_router(auth_router)
