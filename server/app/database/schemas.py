@@ -1,6 +1,9 @@
-from pydantic import BaseModel, Field, field_validator
+import re
 from typing import List, Optional
 from datetime import datetime
+from pydantic import BaseModel, Field, field_validator, ConfigDict
+
+# --- Medical Extraction Schemas ---
 
 class Medicine(BaseModel):
     medicine_name: str = Field(description="Name of the medicine/drug as written in the document")
@@ -11,23 +14,19 @@ class Medicine(BaseModel):
     duration: Optional[str] = Field(None, description="Duration of treatment (e.g., 5 days, 1 month)")
     food_instruction: Optional[str] = Field(None, description="Food instruction (e.g., before food, after food, with meals)")
     purpose: Optional[str] = Field(None, description="Purpose or indication of the medicine (e.g., for pain, for blood pressure)")
-    confidence: Optional[float] = Field(None, description="Confidence score between 0.0 and 1.0 representing the accuracy of the extraction for this medicine")
+    confidence: Optional[float] = Field(None, description="Confidence score between 0.0 and 1.0 representing accuracy")
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = ConfigDict(from_attributes=True)
 
 class MedicalExtraction(BaseModel):
     patient_name: Optional[str] = Field(None, description="Name of the patient, if present")
     doctor_name: Optional[str] = Field(None, description="Name of the doctor/physician, if present")
     medicines: List[Medicine] = Field(default_factory=list, description="List of prescribed medicines with details")
-    lab_values: Optional[str] = Field(None, description="Extracted lab values or test results (e.g., Blood Pressure, SpO2, glucose), if present")
+    lab_values: Optional[str] = Field(None, description="Extracted lab values or test results")
     diagnosis: Optional[str] = Field(None, description="Diagnosis, symptoms, or medical condition mentioned")
-    follow_up_instructions: Optional[str] = Field(None, description="Any follow-up details, instructions, next appointments, or advice")
+    follow_up_instructions: Optional[str] = Field(None, description="Follow-up details or next appointments")
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = ConfigDict(from_attributes=True)
 
 class DocumentResponse(BaseModel):
     id: int
@@ -43,12 +42,37 @@ class DocumentResponse(BaseModel):
     created_at: datetime
     medicines: List[Medicine] = []
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = ConfigDict(from_attributes=True)
+
+class UploadResponse(BaseModel):
+    document_id: Optional[int] = None
+    filename: str
+    content_type: Optional[str] = None
+    size_bytes: int
+    path: str
+    extracted_text: Optional[str] = None
+    extracted_data: Optional[dict] = None
+    indexed_in_chroma: bool = False
+
+    model_config = ConfigDict(from_attributes=True)
+
+class SummaryResponse(BaseModel):
+    report_id: int
+    summary: str
+
+class ChatRequest(BaseModel):
+    query: Optional[str] = Field(None, description="The medical query/question from the user")
+    question: Optional[str] = Field(None, description="Alternative field for the medical query")
+    document_id: Optional[int] = Field(None, description="Optional document ID to restrict context to")
+
+class ChatResponse(BaseModel):
+    query: str
+    answer: str
+
+class MessageResponse(BaseModel):
+    detail: str
 
 # --- Authentication & User Schemas ---
-import re
 
 EMAIL_REGEX = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
 
@@ -76,7 +100,6 @@ class UserCreate(BaseModel):
             raise ValueError("Password must contain at least one lowercase letter")
         if not any(char.isdigit() for char in v):
             raise ValueError("Password must contain at least one digit")
-        # Support common special characters
         special_chars = set("!@#$%^&*()-_=+[]{}|;:',.<>?/`~")
         if not any(char in special_chars for char in v):
             raise ValueError("Password must contain at least one special character")
@@ -89,9 +112,7 @@ class UserResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = ConfigDict(from_attributes=True)
 
 class LoginRequest(BaseModel):
     email: str = Field(..., description="The user's registered email address")
@@ -109,4 +130,3 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     user_id: Optional[int] = None
-

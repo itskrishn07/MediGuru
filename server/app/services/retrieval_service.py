@@ -2,18 +2,19 @@ import logging
 from vectorstore.chroma import get_chroma_collection
 from .embedding_service import embed_text
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("service.retrieval")
 
 def retrieve_relevant_chunks(query: str, n_results: int = 5, document_ids: list[int] | None = None) -> list[dict]:
     """
-    Retrieves the most similar chunks from ChromaDB for a given search query,
-    scoped optionally to a list of allowed document_ids.
+    Retrieves the most similar chunks from ChromaDB for a search query,
+    optionally filtered by document_ids scope.
     """
+    logger.info(f"Retrieving relevant chunks for query: '{query}' (top_k={n_results}, document_ids={document_ids})")
     try:
         # 1. Embed query
         query_embedding = embed_text(query)
         
-        # 2. Prepare filter if document_ids is provided
+        # 2. Build metadata filter
         where_filter = None
         if document_ids is not None:
             if len(document_ids) == 1:
@@ -21,10 +22,11 @@ def retrieve_relevant_chunks(query: str, n_results: int = 5, document_ids: list[
             elif len(document_ids) > 1:
                 where_filter = {"document_id": {"$in": document_ids}}
             else:
-                # Empty list: match nothing to avoid leaking data
-                logger.warning("Empty document_ids list passed. Returning empty context.")
+                logger.warning("Empty document_ids list supplied to retrieval service. Returning empty context.")
                 return []
             
+        logger.debug(f"Executing ChromaDB query with filter: {where_filter}")
+
         # 3. Query Chroma
         collection = get_chroma_collection()
         results = collection.query(
@@ -46,6 +48,7 @@ def retrieve_relevant_chunks(query: str, n_results: int = 5, document_ids: list[
                     "distance": dist
                 })
         
+        logger.info(f"Retrieved {len(retrieved_chunks)} relevant text chunks from ChromaDB.")
         return retrieved_chunks
     except Exception as e:
         logger.error(f"Failed to retrieve chunks for query '{query}': {str(e)}", exc_info=True)

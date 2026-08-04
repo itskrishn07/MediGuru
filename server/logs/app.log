@@ -1,0 +1,27 @@
+2026-08-04 15:40:15,633 [INFO] [req_id=-] [user_id=-] vectorstore.chroma: Initializing ChromaDB client at path: /home/krishna/Desktop/Projects/MediGuru/server/chroma_db
+2026-08-04 15:40:16,180 [INFO] [req_id=-] [user_id=-] vectorstore.chroma: Successfully initialized Persistent ChromaDB client at: /home/krishna/Desktop/Projects/MediGuru/server/chroma_db
+2026-08-04 15:40:16,395 [INFO] [req_id=-] [user_id=-] app.main: ==================================================
+2026-08-04 15:40:16,395 [INFO] [req_id=-] [user_id=-] app.main: Starting MediGuru FastAPI Backend Engine...
+2026-08-04 15:40:16,395 [INFO] [req_id=-] [user_id=-] app.main: Upload Directory: /home/krishna/Desktop/Projects/MediGuru/server/uploads
+2026-08-04 15:40:16,396 [INFO] [req_id=-] [user_id=-] app.main: ChromaDB Directory: /home/krishna/Desktop/Projects/MediGuru/server/chroma_db
+2026-08-04 15:40:16,396 [INFO] [req_id=-] [user_id=-] app.main: ==================================================
+2026-08-04 15:40:16,396 [INFO] [req_id=-] [user_id=-] app.main: Initializing PostgreSQL database tables...
+2026-08-04 15:40:16,578 [INFO] [req_id=-] [user_id=-] app.main: PostgreSQL database tables verified & initialized successfully.
+2026-08-04 15:40:16,579 [INFO] [req_id=-] [user_id=-] app.main: Pre-warming PaddleOCR models on startup...
+2026-08-04 15:40:16,579 [INFO] [req_id=-] [user_id=-] service.ocr: Pre-warming PaddleOCR models...
+2026-08-04 15:40:16,579 [INFO] [req_id=-] [user_id=-] service.ocr: Initializing PaddleOCR instance (first-time model download/load)...
+2026-08-04 15:40:32,428 [INFO] [req_id=-] [user_id=-] service.ocr: PaddleOCR instance initialized successfully.
+2026-08-04 15:40:32,429 [INFO] [req_id=-] [user_id=-] service.ocr: PaddleOCR pre-warming complete.
+2026-08-04 15:40:32,429 [INFO] [req_id=-] [user_id=-] app.main: PaddleOCR models successfully initialized and ready for requests.
+2026-08-04 15:40:32,430 [INFO] [req_id=-] [user_id=-] app.main: MediGuru startup completed. Ready to receive HTTP traffic.
+2026-08-04 15:40:40,134 [INFO] [req_id=bb317903-8d4b-4361-884b-ab392d05e99b] [user_id=-] api.access: Incoming Request: GET /api | Client IP: 127.0.0.1
+2026-08-04 15:40:40,159 [INFO] [req_id=bb317903-8d4b-4361-884b-ab392d05e99b] [user_id=-] api.access: Outgoing Response: GET /api | Status: 404 | Duration: 25.46ms
+2026-08-04 15:40:40,785 [INFO] [req_id=0ebeded9-7d04-48f5-9173-ffbce5917a2c] [user_id=-] api.access: Incoming Request: GET /favicon.ico | Client IP: 127.0.0.1
+2026-08-04 15:40:40,786 [INFO] [req_id=0ebeded9-7d04-48f5-9173-ffbce5917a2c] [user_id=-] api.access: Outgoing Response: GET /favicon.ico | Status: 404 | Duration: 1.44ms
+2026-08-04 15:40:43,993 [INFO] [req_id=7a116871-71b2-43dc-bf33-d953dfb220d7] [user_id=-] api.access: Incoming Request: GET / | Client IP: 127.0.0.1
+2026-08-04 15:40:43,998 [INFO] [req_id=7a116871-71b2-43dc-bf33-d953dfb220d7] [user_id=-] app.main: Root health-check endpoint pinged.
+2026-08-04 15:40:43,998 [INFO] [req_id=7a116871-71b2-43dc-bf33-d953dfb220d7] [user_id=-] api.access: Outgoing Response: GET / | Status: 200 | Duration: 5.59ms
+2026-08-04 15:40:46,296 [INFO] [req_id=343bb239-7baa-4364-9db2-e7b98d4639f4] [user_id=-] api.access: Incoming Request: GET /docs | Client IP: 127.0.0.1
+2026-08-04 15:40:46,297 [INFO] [req_id=343bb239-7baa-4364-9db2-e7b98d4639f4] [user_id=-] api.access: Outgoing Response: GET /docs | Status: 200 | Duration: 1.14ms
+2026-08-04 15:40:47,072 [INFO] [req_id=88d36b2b-4e00-4d40-a1f2-a954c8cd3e0d] [user_id=-] api.access: Incoming Request: GET /openapi.json | Client IP: 127.0.0.1
+2026-08-04 15:40:47,190 [INFO] [req_id=88d36b2b-4e00-4d40-a1f2-a954c8cd3e0d] [user_id=-] api.access: Outgoing Response: GET /openapi.json | Status: 200 | Duration: 118.09ms

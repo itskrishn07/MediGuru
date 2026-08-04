@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import Dict, Any
 from sqlalchemy.orm import Session
 
 from .pdf_service import process_pdf
@@ -12,14 +13,14 @@ from core.constants import SUPPORTED_IMAGE_EXTENSIONS, SUPPORTED_PDF_EXTENSIONS
 
 logger = logging.getLogger(__name__)
 
-def process_document(db: Session, file_path: Path, content_type: str, user_id: int) -> dict:
+def process_document(db: Session, file_path: Path, content_type: str, user_id: int) -> Dict[str, Any]:
     """
-    Orchestrates the entire document processing pipeline:
+    Orchestrates document processing:
     1. Determines file type (PDF vs Image).
-    2. Invokes correct extraction service (pdf_service / image_service) to perform text extraction/OCR.
-    3. Invokes LLM service to perform structured medical data extraction.
-    4. Saves the structured JSON results to PostgreSQL.
-    5. Chunks, embeds, and indexes the text in ChromaDB.
+    2. Runs text extraction/OCR (pdf_service / image_service).
+    3. Invokes Gemini LLM for structured medical data extraction.
+    4. Saves extracted records to PostgreSQL database.
+    5. Chunks and indexes text embeddings in ChromaDB.
     """
     suffix = file_path.suffix.lower()
     is_pdf = (content_type == "application/pdf") or (suffix in SUPPORTED_PDF_EXTENSIONS)
@@ -42,13 +43,11 @@ def process_document(db: Session, file_path: Path, content_type: str, user_id: i
             logger.error(f"Failed to process Image {file_path.name}: {str(ocr_err)}")
             extracted_text = f"OCR Extraction Failed: {str(ocr_err)}"
 
-    # LLM Processing
     extracted_data = None
     db_document = None
     indexed_in_chroma = False
 
     if is_pdf or is_image:
-        # Pass image_path only if it is an image to leverage vision model capabilities
         image_path = file_path if is_image else None
         extracted_data_dict = analyze_medical_document(
             ocr_text=extracted_text,
@@ -56,7 +55,6 @@ def process_document(db: Session, file_path: Path, content_type: str, user_id: i
             suffix=suffix if is_image else None
         )
         
-        # 1. Parse extraction result to MedicalExtraction schema
         if extracted_data_dict and "error" not in extracted_data_dict:
             try:
                 extracted_data = MedicalExtraction(**extracted_data_dict)
@@ -66,7 +64,6 @@ def process_document(db: Session, file_path: Path, content_type: str, user_id: i
         else:
             extracted_data = MedicalExtraction()
 
-        # 2. Save structured extraction in PostgreSQL
         try:
             logger.info(f"Saving extracted document '{file_path.name}' to PostgreSQL...")
             db_document = crud.create_document(
@@ -81,7 +78,6 @@ def process_document(db: Session, file_path: Path, content_type: str, user_id: i
         except Exception as db_err:
             logger.error(f"Failed to save document to PostgreSQL: {str(db_err)}", exc_info=True)
 
-        # 3. Chunk and index text into ChromaDB using the PostgreSQL DB ID
         if db_document and extracted_text:
             logger.info(f"Indexing document '{file_path.name}' text in ChromaDB...")
             indexed_in_chroma = index_document(
