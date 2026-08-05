@@ -27,12 +27,12 @@ async def lifespan(app: FastAPI):
     logger.info("==================================================")
 
     # Pre-warm Embedding client
-    logger.info("Pre-warming Embedding client on startup...")
+    logger.info("Pre-warming Mistral Embeddings client on startup...")
     try:
-        model_type, _ = get_embeddings_client()
-        logger.info(f"Embedding client ({model_type}) pre-warmed successfully.")
+        get_embeddings_client()
+        logger.info("Mistral Embeddings client initialized successfully.")
     except Exception as e:
-        logger.error(f"Failed to pre-warm Embedding client: {str(e)}")
+        logger.error(f"Failed to pre-warm Mistral Embeddings client: {str(e)}")
 
     logger.info("Startup sequence complete. Server ready.")
     yield
