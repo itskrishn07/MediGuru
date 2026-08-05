@@ -1,358 +1,119 @@
-# MediGuru 🏥
+# MediGuru 🏥 — AI Medical Document Intelligence MVP
 
-## AI-Powered Multi-Modal Medical Document Analyzer using OCR, LLMs & RAG
+An AI-powered multi-modal medical document intelligence platform that extracts structured medical data, generates patient-friendly summaries, and enables interactive RAG Q&A using **FastAPI**, **Streamlit**, **Google Gemini 2.5 Flash Vision**, and **ChromaDB**.
 
-An end-to-end AI application that intelligently analyzes doctor prescriptions, medical lab reports, and healthcare documents from images and PDFs using OCR, Gemini 2.5 Flash, PostgreSQL, and ChromaDB.
+---
 
-## 📌 Overview
+## 📌 Features
 
-MediGuru is an AI-powered medical document intelligence platform that transforms unstructured medical documents into structured, searchable, and interactive knowledge.
+### 📄 Multi-Format Document Ingestion
+- Upload `.jpg`, `.jpeg`, `.png` images or `.pdf` documents.
+- Supports handwritten prescriptions, diagnostic lab reports, and hospital summaries.
 
-Users can upload handwritten prescriptions, scanned reports, or digital PDFs. The system extracts text using OCR, understands the medical information using Google's Gemini LLM, stores structured information in PostgreSQL, generates embeddings for semantic search using ChromaDB, and enables users to chat with their reports using Retrieval-Augmented Generation (RAG).
-
-## 🚀 Features
-
-### 📄 Multi-Format Document Support
-- Upload Images (`.jpg`, `.jpeg`, `.png`)
-- Upload PDFs
-- Supports:
-  - Doctor Prescriptions
-  - Medical Reports
-  - Diagnostic Reports
-  - Laboratory Reports
-
-### 🔍 Intelligent OCR Pipeline
-- PaddleOCR
-- Native Text Extraction for Digital PDFs
-- Automatic OCR Fallback for Scanned PDFs
-- High Accuracy Text Recognition
-
-### 🤖 AI-Powered Medical Information Extraction
-Using Gemini 2.5 Flash, the application extracts:
-- Patient Name
-- Doctor Name
-- Medicines
-- Dosage
-- Frequency
-- Duration
-- Food Instructions
-- Lab Values
-- Diagnosis
-- Follow-up Instructions
-
-### 📋 Structured JSON Generation
-
-Example:
-```json
-{
-    "patient_name":"John Doe",
-    "doctor_name":"Dr Sharma",
-    "medicines":[
-        {
-            "medicine_name":"Paracetamol 650",
-            "dosage":"1 Tablet",
-            "frequency":"Twice Daily",
-            "duration":"5 Days",
-            "food_instruction":"After Food"
-        }
-    ]
-}
-```
+### 🤖 Pure AI Multimodal Vision Analysis (Gemini 2.5 Flash)
+- **Zero Heavy OCR Dependencies**: Uses Google Gemini 2.5 Flash Multimodal Vision API directly for 2-second ultra-fast document extraction.
+- Parses structured JSON containing:
+  - Patient Name & Doctor Name
+  - Diagnosis & Follow-up Details
+  - Prescribed Medicines (Strength, Dosage, Frequency, Duration, Food Instructions, Purpose)
+  - Lab Test Values & Reference Ranges
 
 ### 📝 AI Medical Summary
+Generates a concise, patient-friendly medical summary highlighting condition, active prescriptions, and follow-up timelines.
 
-Generate an easy-to-understand summary of complex medical reports.
+### 🧠 Retrieval-Augmented Generation (RAG)
+- Chunks document text and generates vector embeddings using **Mistral Embeddings** / `sentence-transformers`.
+- Indexes embeddings in a session-scoped **temporary ChromaDB** instance (`temp/chroma`).
+- Provides a conversational Streamlit chat interface to answer questions like:
+  - *"What medicines should I take after food?"*
+  - *"Explain my diagnosis in simple words."*
+  - *"What are my lab test results?"*
 
-Example:
-> The patient is diagnosed with viral fever. The prescribed medicines should be taken twice daily after food. Follow-up is scheduled after 7 days.
+### 🗑️ Session Privacy & Cleanup
+Clicking **Clear Session** instantly purges uploaded documents, cached embeddings, and temporary ChromaDB collections so no medical data remains persisted.
 
-### 🧠 Retrieval Augmented Generation (RAG)
-
-Users can ask questions like:
-- What medicines am I taking?
-- What are my abnormal lab values?
-- When should I visit the doctor again?
-- Explain my diagnosis in simple language.
-- Compare this report with my previous report.
-
-### 💾 PostgreSQL Storage
-
-Stores:
-- Extracted Reports
-- Patient Information
-- Medicines
-- Metadata
-- AI Generated Summary
-
-### 🔍 Semantic Search using ChromaDB
-
-The extracted medical text is:
-- Chunked
-- Embedded
-- Stored inside ChromaDB
-
-This enables semantic retrieval for contextual question answering.
-
-### 📊 Intelligent Chat
-
-Users can chat with their uploaded reports using Retrieval-Augmented Generation.
+---
 
 ## 🏗️ System Architecture
 
 ```text
-                           User
-                             │
-                             ▼
-                   Upload Image / PDF
-                             │
-                             ▼
-                    FastAPI Backend
-                             │
-                             ▼
-                  Document Processor
-             ┌───────────────┴────────────────┐
-             ▼                                ▼
-      Image Service                     PDF Service
-             │                                │
-             └───────────────┬────────────────┘
-                             ▼
-                       OCR Service
-      (PaddleOCR / Native PDF Extraction)
-                             │
-                             ▼
-                      Extracted Text
-                             │
-             ┌───────────────┴────────────────┐
-             ▼                                ▼
-         Gemini LLM                    Chunking Service
-             │                                │
-             ▼                                ▼
-     Structured JSON                 Embedding Service
-             │                                │
-             ▼                                ▼
-       PostgreSQL                     ChromaDB
-             │                                │
-             └───────────────┬────────────────┘
-                             ▼
-                    Retrieval Service
-                             │
-                             ▼
-                       Chat Service
-                             │
-                             ▼
-                     AI Generated Answer
+Streamlit Frontend (frontend/app.py)
+  │
+  ├── Sidebar: Upload Image/PDF ──► Process Button ──► Clear Session Button
+  ├── Main Display: AI Summary Box, Structured Reports (Patient, Doctor, Medicines Table, Labs)
+  └── Interactive RAG Chat Widget
+        │
+        │ HTTP API Calls (8000)
+        ▼
+FastAPI Backend Engine (server/app/main.py)
+  │
+  ├── POST /process ──► Document Processor ──► Gemini 2.5 Flash Vision ──► Chunking & Embeddings ──► Temp ChromaDB
+  ├── POST /chat    ──► RAG Retriever ──► Chroma Vector Similarity Search ──► Gemini Contextual Answer
+  ├── POST /clear-session ──► Purge Temp Uploads & Reset ChromaDB Collection
+  └── GET /health   ──► Server Status
 ```
 
-## 🧠 AI Pipeline
-
-```text
-Upload Document
-
-↓
-
-Detect Document Type
-
-↓
-
-Image / PDF Processing
-
-↓
-
-OCR / Native Text Extraction
-
-↓
-
-Gemini Medical Information Extraction
-
-↓
-
-Structured JSON
-
-↓
-
-Generate Medical Summary
-
-↓
-
-Store in PostgreSQL
-
-↓
-
-Chunk Document
-
-↓
-
-Generate Embeddings
-
-↓
-
-Store in ChromaDB
-
-↓
-
-Retrieve Relevant Chunks
-
-↓
-
-Generate Context-Aware Answers
-```
+---
 
 ## 🛠️ Tech Stack
 
-- **Backend**
-  - FastAPI
-  - Python 3.12
-- **OCR**
-  - PaddleOCR
-- **LLM**
-  - Gemini 2.5 Flash
-- **Database**
-  - PostgreSQL
-- **Vector Database**
-  - ChromaDB
-- **AI**
-  - LangChain
-- **RAG**
-  - Prompt Engineering
-- **PDF Processing**
-  - PyMuPDF
-- **Data Validation**
-  - Pydantic
-- **Logging**
-  - Python Logging
+- **Backend Framework**: FastAPI (Python 3.12)
+- **Frontend Framework**: Streamlit
+- **Multimodal AI Engine**: Google Gemini API (`gemini-2.5-flash` Multimodal Vision)
+- **Vector Database**: ChromaDB (Ephemeral / Temporary Session Storage)
+- **Embeddings**: Mistral AI Embeddings (`mistral-embed`) / SentenceTransformers
+- **PDF Extraction**: PyMuPDF (`fitz` / `pypdf`)
 
-## 📂 Project Structure
+---
 
-```text
-server/
-│
-├── app/
-│   ├── api/
-│   ├── core/
-│   ├── database/
-│   ├── prompts/
-│   ├── services/
-│   ├── vectorstore/
-│   ├── main.py
-│   └── .env
-│
-├── chroma_db/
-│
-├── uploads/
-│
-├── requirements.txt
-└── .gitignore
-```
+## 🚀 Getting Started
 
-## ⚙️ Installation
+### 1. Setup Virtual Environment & Install Dependencies
 
-Clone the repository
 ```bash
+# Clone the repository
 git clone https://github.com/yourusername/MediGuru.git
-```
+cd MediGuru
 
-Move into the project
-```bash
-cd MediGuru/server
-```
+# Create & activate python virtual environment
+python -m venv server/.venv
+source server/.venv/bin/activate   # On Linux/macOS
+# server\.venv\Scripts\activate   # On Windows
 
-Create a virtual environment
-```bash
-python -m venv .venv
-```
-
-Activate it
-
-**Windows**
-```cmd
-.venv\Scripts\activate
-```
-
-**Linux / macOS**
-```bash
-source .venv/bin/activate
-```
-
-Install dependencies
-```bash
+# Install lightweight dependencies
 pip install -r requirements.txt
 ```
 
-Create a `.env` file
+### 2. Configure Environment Variables
+
+Create a `.env` file in the root directory:
+
 ```env
-GEMINI_API_KEY=YOUR_API_KEY
-DATABASE_URL=YOUR_DATABASE_URL
+GEMINI_API_KEY=your_gemini_api_key_here
+MISTRAL_API_KEY=your_mistral_api_key_here
+BACKEND_URL=http://localhost:8000
 ```
 
-Run the server
+### 3. Run FastAPI Backend
+
 ```bash
-uvicorn app.main:app --reload
+uvicorn server.app.main:app --reload --port 8000
 ```
 
-## 📡 API
+FastAPI Swagger documentation: [http://localhost:8000/docs](http://localhost:8000/docs).
 
-### Upload Document
-`POST /upload`
+### 4. Run Streamlit Frontend
 
-Upload
-- Image
-- PDF
+In a new terminal tab:
 
-Returns
-- Extracted Text
-- Structured JSON
-- Medical Summary
-
-### Chat with Reports
-`POST /chat`
-
-Example
-```json
-{
-    "question":"What medicines am I taking?"
-}
+```bash
+streamlit run frontend/app.py
 ```
 
-## 📈 Future Enhancements
+Streamlit web app: [http://localhost:8501](http://localhost:8501).
 
-- React Frontend
-- User Authentication
-- Medical History Dashboard
-- Voice-based Medical Assistant
-- Multi-language OCR
-- Report Comparison Timeline
-- Medicine Interaction Detection
-- Drug Recommendation Warnings
-- Cloud Storage Integration (AWS S3 / Supabase Storage)
-- Docker Deployment
-- CI/CD Pipeline
-- Admin Analytics Dashboard
-
-## 🎯 Learning Outcomes
-
-This project demonstrates practical experience with:
-- FastAPI Backend Development
-- OCR Pipelines
-- Large Language Models (LLMs)
-- Prompt Engineering
-- Structured Output Generation
-- Retrieval-Augmented Generation (RAG)
-- Vector Databases
-- PostgreSQL
-- AI System Design
-- Modular Software Architecture
-- Production-Oriented Backend Development
+---
 
 ## 📜 License
 
-This project is licensed under the MIT License.
-
-## 👨‍💻 Author
-
-**Krishna Gupta**
-
-B.Tech Computer Science Engineering (AI, ML & DL)
-
-Aspiring AI Engineer | Generative AI | Machine Learning | Backend Development
-
-⭐ If you found this project interesting, consider giving it a star on GitHub!
+MIT License. Created by Krishna Gupta.

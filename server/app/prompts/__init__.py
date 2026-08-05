@@ -7,4 +7,3 @@ from .medical_extraction import (
 )
 from .summary_prompt import SUMMARY_PROMPT
 from .chat_prompt import CHAT_PROMPT
-from .comparison_prompt import COMPARISON_PROMPT

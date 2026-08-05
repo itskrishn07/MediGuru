@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 def get_gemini_llm(model_name: str = "gemini-2.5-flash", temperature: float = 0.0) -> ChatGoogleGenerativeAI:
     """
     Factory function to create and return a configured ChatGoogleGenerativeAI instance.
-    Validates API key configuration prior to instantiation.
     """
     api_key = settings.GOOGLE_API_KEY
     if not api_key:
@@ -20,5 +19,6 @@ def get_gemini_llm(model_name: str = "gemini-2.5-flash", temperature: float = 0.
     return ChatGoogleGenerativeAI(
         model=model_name,
         temperature=temperature,
-        api_key=api_key
+        api_key=api_key,
+        timeout=60
     )

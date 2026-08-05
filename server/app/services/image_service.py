@@ -1,20 +1,12 @@
 import logging
 import base64
 from pathlib import Path
-from .ocr_service import run_ocr
 
 logger = logging.getLogger("service.image")
 
-def process_image(file_path: Path) -> str:
-    """
-    Processes an image file to extract text via OCR.
-    """
-    logger.info(f"Delegating image OCR extraction for: {file_path.name}")
-    return run_ocr(file_path)
-
 def get_image_base64(file_path: Path) -> str:
     """
-    Encodes the image file to base64.
+    Encodes the image file to base64 for Gemini Vision API.
     """
     logger.debug(f"Encoding image to base64: {file_path.name}")
     with open(file_path, "rb") as image_file:

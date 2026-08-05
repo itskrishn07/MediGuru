@@ -3,8 +3,8 @@ import time
 from pathlib import Path
 from typing import Optional, Dict, Any
 from langchain_core.messages import HumanMessage
-from database.schemas import MedicalExtraction
-from prompts import PRESCRIPTION_PROMPT
+from schemas import MedicalExtraction
+from prompts.medical_extraction import PRESCRIPTION_PROMPT
 from core.config import settings
 from .llm_factory import get_gemini_llm
 from .image_service import get_image_base64, get_image_mime_type

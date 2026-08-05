@@ -1,55 +1,54 @@
 import logging
+import shutil
 from pathlib import Path
 import chromadb
 from core.config import settings
 
 logger = logging.getLogger("vectorstore.chroma")
 
-def initialize_chroma_client():
-    db_path = settings.CHROMA_DB_DIR
-    logger.info(f"Initializing ChromaDB client at path: {db_path}")
-    
-    # 1. Try to create the directory
-    try:
+_client = None
+
+def get_chroma_client():
+    global _client
+    if _client is None:
+        db_path = settings.CHROMA_DB_DIR
         db_path.mkdir(parents=True, exist_ok=True)
-    except Exception as e:
-        logger.warning(f"Could not create primary ChromaDB directory at {db_path}: {e}")
-        
-    # 2. Test directory writability
-    is_writable = False
-    test_file = db_path / ".write_test"
-    try:
-        if db_path.exists() and db_path.is_dir():
-            with open(test_file, "w") as f:
-                f.write("test")
-            test_file.unlink()
-            is_writable = True
-    except Exception as e:
-        logger.warning(f"Primary ChromaDB path {db_path} is not writable: {e}")
-
-    if not is_writable:
-        fallback_path = Path.home() / ".mediguru_chroma_db"
-        logger.warning(f"Primary path {db_path} unwritable. Falling back to: {fallback_path}")
         try:
-            fallback_path.mkdir(parents=True, exist_ok=True)
-            db_path = fallback_path
+            logger.info(f"Initializing Persistent ChromaDB client at: {db_path}")
+            _client = chromadb.PersistentClient(path=str(db_path))
         except Exception as e:
-            logger.critical(f"Failed to create fallback directory at {fallback_path}: {e}. Defaulting to ephemeral client.")
-            return chromadb.EphemeralClient()
-            
-    try:
-        client_inst = chromadb.PersistentClient(path=str(db_path))
-        logger.info(f"Successfully initialized Persistent ChromaDB client at: {db_path}")
-        return client_inst
-    except Exception as e:
-        logger.critical(f"Failed to instantiate Persistent Client at {db_path}: {e}. Falling back to ephemeral/in-memory client.", exc_info=True)
-        return chromadb.EphemeralClient()
-
-client = initialize_chroma_client()
+            logger.warning(f"Failed to instantiate Persistent Client: {e}. Falling back to EphemeralClient.")
+            _client = chromadb.EphemeralClient()
+    return _client
 
 def get_chroma_collection(collection_name: str = "medical_documents"):
     """
     Returns (or creates) the specified ChromaDB collection.
     """
-    logger.debug(f"Accessing ChromaDB collection: '{collection_name}'")
+    client = get_chroma_client()
     return client.get_or_create_collection(name=collection_name)
+
+def reset_chroma_session(collection_name: str = "medical_documents"):
+    """
+    Deletes collection and wipes temporary session directory.
+    """
+    global _client
+    logger.info("Resetting ChromaDB session and clearing temporary files...")
+    client = get_chroma_client()
+    try:
+        client.delete_collection(name=collection_name)
+        logger.info(f"Deleted collection '{collection_name}' from ChromaDB.")
+    except Exception as e:
+        logger.warning(f"Collection reset warning: {str(e)}")
+
+    # Clean upload temp directory
+    try:
+        if settings.UPLOAD_DIR.exists():
+            for item in settings.UPLOAD_DIR.iterdir():
+                if item.is_file():
+                    item.unlink()
+                elif item.is_dir():
+                    shutil.rmtree(item)
+            logger.info("Wiped upload directory contents.")
+    except Exception as err:
+        logger.error(f"Failed to clear temp uploads: {str(err)}")

@@ -1,43 +1,49 @@
 import logging
-import pypdf
 from pathlib import Path
-from .ocr_service import run_ocr
+import pypdf
+
+try:
+    import fitz  # PyMuPDF
+except ImportError:
+    fitz = None
 
 logger = logging.getLogger("service.pdf")
 
 def extract_native_text(file_path: Path) -> str:
     """
-    Attempts to extract text natively from a PDF file using pypdf.
+    Extracts text natively from a digital PDF file using PyMuPDF (fitz) or pypdf.
+    Extremely fast (~0.01 seconds).
     """
     text_parts = []
-    with open(file_path, "rb") as f:
-        reader = pypdf.PdfReader(f)
-        num_pages = len(reader.pages)
-        logger.info(f"Extracting native text from PDF '{file_path.name}' ({num_pages} pages)")
-        for idx, page in enumerate(reader.pages):
-            text = page.extract_text()
-            if text:
-                text_parts.append(text)
+    
+    # 1. Try PyMuPDF first (fastest & most accurate)
+    if fitz:
+        try:
+            doc = fitz.open(str(file_path))
+            for page in doc:
+                text = page.get_text()
+                if text and len(text.strip()) > 10:
+                    text_parts.append(text.strip())
+            doc.close()
+            if text_parts:
+                extracted = "\n\n".join(text_parts).strip()
+                logger.info(f"PyMuPDF extracted {len(extracted)} chars from '{file_path.name}'.")
+                return extracted
+        except Exception as err:
+            logger.warning(f"PyMuPDF text extraction notice: {err}")
 
-    extracted = "\n".join(text_parts).strip()
-    logger.info(f"Native PDF extraction finished for '{file_path.name}'. Character count: {len(extracted)}")
-    return extracted
-
-def process_pdf(file_path: Path) -> str:
-    """
-    Processes a PDF file. Attempts native text extraction first.
-    If no text is found (e.g. scanned PDF), falls back to OCR.
-    """
-    logger.info(f"Processing PDF document: {file_path.name}")
+    # 2. Fallback to pypdf
     try:
-        native_text = extract_native_text(file_path)
-        if native_text:
-            logger.info(f"Native PDF text extraction successful for '{file_path.name}'. Skipping OCR.")
-            return native_text
-        else:
-            logger.warning(f"No native text found in PDF '{file_path.name}'. PDF appears to be a scanned image.")
+        with open(file_path, "rb") as f:
+            reader = pypdf.PdfReader(f)
+            for page in reader.pages:
+                text = page.extract_text()
+                if text and len(text.strip()) > 10:
+                    text_parts.append(text.strip())
+        extracted = "\n\n".join(text_parts).strip()
+        logger.info(f"pypdf extracted {len(extracted)} chars from '{file_path.name}'.")
+        return extracted
     except Exception as e:
-        logger.error(f"Native PDF extraction failed for '{file_path.name}': {str(e)}. Triggering OCR fallback.", exc_info=True)
+        logger.error(f"Native PDF extraction failed for '{file_path.name}': {str(e)}")
 
-    logger.info(f"Triggering PaddleOCR fallback for PDF document '{file_path.name}'...")
-    return run_ocr(file_path)
+    return ""

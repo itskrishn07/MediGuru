@@ -4,35 +4,17 @@ from .embedding_service import embed_text
 
 logger = logging.getLogger("service.retrieval")
 
-def retrieve_relevant_chunks(query: str, n_results: int = 5, document_ids: list[int] | None = None) -> list[dict]:
+def retrieve_relevant_chunks(query: str, n_results: int = 5) -> list[dict]:
     """
-    Retrieves the most similar chunks from ChromaDB for a search query,
-    optionally filtered by document_ids scope.
+    Retrieves the most similar chunks from ChromaDB for a search query.
     """
-    logger.info(f"Retrieving relevant chunks for query: '{query}' (top_k={n_results}, document_ids={document_ids})")
+    logger.info(f"Retrieving relevant chunks for query: '{query}' (top_k={n_results})")
     try:
-        # 1. Embed query
         query_embedding = embed_text(query)
-        
-        # 2. Build metadata filter
-        where_filter = None
-        if document_ids is not None:
-            if len(document_ids) == 1:
-                where_filter = {"document_id": document_ids[0]}
-            elif len(document_ids) > 1:
-                where_filter = {"document_id": {"$in": document_ids}}
-            else:
-                logger.warning("Empty document_ids list supplied to retrieval service. Returning empty context.")
-                return []
-            
-        logger.debug(f"Executing ChromaDB query with filter: {where_filter}")
-
-        # 3. Query Chroma
         collection = get_chroma_collection()
         results = collection.query(
             query_embeddings=[query_embedding],
-            n_results=n_results,
-            where=where_filter
+            n_results=n_results
         )
         
         retrieved_chunks = []
