@@ -20,5 +20,6 @@ def get_gemini_llm(model_name: str = "gemini-2.5-flash", temperature: float = 0.
         model=model_name,
         temperature=temperature,
         api_key=api_key,
+        max_retries=2,
         timeout=60
     )

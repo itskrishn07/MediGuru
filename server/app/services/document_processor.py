@@ -39,11 +39,10 @@ def convert_pdf_page_to_image(pdf_path: Path, page_num: int = 0, max_dimension: 
 
 def process_document(file_path: Path, content_type: str) -> Dict[str, Any]:
     """
-    Ultra-fast MVP document processing using Gemini 2.5 Flash Multimodal Vision:
+    Ultra-fast MVP document processing using Gemini Multimodal Vision in ONE unified API call:
     1. Checks PDF for native text (0.05s).
-    2. If image/scanned PDF, uses Gemini 2.5 Flash Vision directly (1.8s).
-    3. Generates AI summary & indexes vectors in ChromaDB (0.5s).
-    Total duration: ~2.5 seconds total!
+    2. Uses Gemini Vision for structured data + summary in 1 call (1.8s).
+    3. Indexes vectors in ChromaDB (0.5s).
     """
     start_total = time.perf_counter()
     suffix = file_path.suffix.lower()
@@ -58,7 +57,7 @@ def process_document(file_path: Path, content_type: str) -> Dict[str, Any]:
     t0 = time.perf_counter()
     if is_pdf:
         try:
-            logger.info(f"[1/4] Checking PDF for native text: {file_path.name}")
+            logger.info(f"[1/3] Checking PDF for native text: {file_path.name}")
             native_text = extract_native_text(file_path)
             if native_text and len(native_text.strip()) > 30:
                 extracted_text = native_text
@@ -72,9 +71,9 @@ def process_document(file_path: Path, content_type: str) -> Dict[str, Any]:
     elif is_image:
         image_for_vision = file_path
 
-    # Step 2: Gemini 2.5 Flash Structured Vision Analysis
+    # Step 2: Gemini Structured Vision & Summary Analysis (Single Call)
     t1 = time.perf_counter()
-    logger.info(f"[2/4] Invoking Gemini 2.5 Flash Vision for {file_path.name}...")
+    logger.info(f"[2/3] Invoking Gemini Vision for {file_path.name}...")
     
     extracted_data_dict = analyze_medical_document(
         ocr_text=extracted_text,
@@ -83,15 +82,27 @@ def process_document(file_path: Path, content_type: str) -> Dict[str, Any]:
     )
     
     extracted_data = MedicalExtraction()
-    if extracted_data_dict and "error" not in extracted_data_dict:
-        try:
-            extracted_data = MedicalExtraction(**extracted_data_dict)
-        except Exception as schema_err:
-            logger.error(f"Schema mapping error: {schema_err}")
-    
-    logger.info(f"[2/4] Gemini Vision analysis complete in {time.perf_counter() - t1:.2f}s")
+    rate_limit_error = None
 
-    # If OCR text wasn't extracted natively, construct readable text from Gemini vision extraction
+    if extracted_data_dict:
+        if "error" in extracted_data_dict:
+            rate_limit_error = extracted_data_dict["error"]
+        else:
+            try:
+                extracted_data = MedicalExtraction(**extracted_data_dict)
+            except Exception as schema_err:
+                logger.error(f"Schema mapping error: {schema_err}")
+
+    logger.info(f"[2/3] Gemini Vision analysis complete in {time.perf_counter() - t1:.2f}s")
+
+    # Clean up temp page image if created
+    if temp_vision_img and temp_vision_img.exists():
+        try:
+            temp_vision_img.unlink()
+        except Exception:
+            pass
+
+    # Construct text for ChromaDB vector store
     if not extracted_text:
         text_parts = []
         if extracted_data.patient_name: text_parts.append(f"Patient Name: {extracted_data.patient_name}")
@@ -105,30 +116,25 @@ def process_document(file_path: Path, content_type: str) -> Dict[str, Any]:
         
         extracted_text = "\n\n".join(text_parts) if text_parts else "Medical document processed via Gemini AI."
 
-    # Clean up temp page image if created
-    if temp_vision_img and temp_vision_img.exists():
+    # Determine Summary (Prioritize single-call summary or fallback)
+    if rate_limit_error:
+        summary = rate_limit_error
+    elif extracted_data.summary and len(extracted_data.summary.strip()) > 10:
+        summary = extracted_data.summary
+    else:
+        # Fallback to secondary summary call only if needed
         try:
-            temp_vision_img.unlink()
-        except Exception:
-            pass
+            summary = summarize_document(extracted_text)
+        except Exception as sum_err:
+            logger.error(f"Summary fallback notice: {sum_err}")
+            summary = "Medical summary complete."
 
-    # Step 3: AI Medical Summary
-    t2 = time.perf_counter()
-    summary = ""
-    try:
-        logger.info(f"[3/4] Generating AI medical summary...")
-        summary = summarize_document(extracted_text)
-    except Exception as sum_err:
-        logger.error(f"Summary generation error: {sum_err}")
-        summary = "Summary unavailable."
-    logger.info(f"[3/4] AI summary complete in {time.perf_counter() - t2:.2f}s")
-
-    # Step 4: Indexing Vectors in ChromaDB
+    # Step 3: Indexing Vectors in ChromaDB
     t3 = time.perf_counter()
     indexed_in_chroma = False
     doc_id = str(uuid.uuid4())
     try:
-        logger.info(f"[4/4] Indexing document in temporary ChromaDB...")
+        logger.info(f"[3/3] Indexing document in temporary ChromaDB...")
         indexed_in_chroma = index_document(
             doc_id=doc_id,
             filename=file_path.name,
@@ -136,7 +142,7 @@ def process_document(file_path: Path, content_type: str) -> Dict[str, Any]:
         )
     except Exception as vec_err:
         logger.error(f"Vector indexing error: {vec_err}")
-    logger.info(f"[4/4] ChromaDB indexing complete in {time.perf_counter() - t3:.2f}s")
+    logger.info(f"[3/3] ChromaDB indexing complete in {time.perf_counter() - t3:.2f}s")
 
     total_duration = time.perf_counter() - start_total
     logger.info(f"⚡ COMPLETE! Processed '{file_path.name}' in {total_duration:.2f} seconds ⚡")

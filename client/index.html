@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MediGuru - AI-Powered Medical Document Analyzer</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "primary": "#004ac6",
+                        "primary-container": "#2563eb",
+                        "surface-container-low": "#eff4ff",
+                        "background": "#f8f9ff",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-fixed": "#acedff",
+                        "on-secondary-fixed": "#001f26",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "primary-fixed": "#dbe1ff",
+                        "secondary-container": "#57dffe",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "surface-container-high": "#dce9ff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-dim": "#cbdbf5",
+                        "surface": "#f8f9ff",
+                        "secondary": "#00687a",
+                        "inverse-surface": "#213145",
+                        "on-secondary-container": "#006172",
+                        "secondary-fixed-dim": "#4cd7f6",
+                        "inverse-primary": "#b4c5ff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "on-surface-variant": "#434655",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-primary-fixed": "#00174b",
+                        "outline": "#737686",
+                        "tertiary": "#525657",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#eeefff",
+                        "tertiary-container": "#6b6e70",
+                        "on-tertiary-container": "#eff1f3",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "on-surface": "#0b1c30",
+                        "on-background": "#0b1c30",
+                        "on-tertiary-fixed": "#191c1e",
+                        "surface-variant": "#d3e4fe",
+                        "surface-tint": "#0053db",
+                        "outline-variant": "#c3c6d7",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "lg": "40px",
+                        "sm": "16px",
+                        "xs": "8px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Manrope"],
+                        "body-sm": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Manrope"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Manrope"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    },
+                    boxShadow: {
+                        'ambient-sm': '0 4px 20px -2px rgba(37, 99, 235, 0.05)',
+                        'ambient-md': '0 8px 30px -4px rgba(37, 99, 235, 0.06)',
+                        'ambient-lg': '0 12px 40px -6px rgba(37, 99, 235, 0.08)',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .pulse-cyan {
+            box-shadow: inset 0 0 0 2px #57dffe, 0 0 15px rgba(87, 223, 254, 0.3);
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-ring {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .upload-dashed {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='12' ry='12' stroke='%23C3C6D7FF' stroke-width='2' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+            border-radius: 12px;
+        }
+
+        .upload-dashed:hover {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='12' ry='12' stroke='%232563EBFF' stroke-width='2' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+    <!-- TopAppBar -->
+    <header
+        class="bg-surface dark:bg-inverse-surface shadow-sm dark:shadow-none sticky full-width top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface">
+        <div class="flex justify-between items-center w-full px-lg py-sm max-w-container-max mx-auto">
+            <div class="flex items-center gap-sm">
+                <span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="clinical_notes"
+                    data-weight="fill" style="font-variation-settings: 'FILL' 1;">clinical_notes</span>
+                <h1
+                    class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed cursor-pointer active:opacity-80 transition-all">
+                    MediGuru</h1>
+            </div>
+            <div class="flex items-center gap-md">
+                <div id="backend-status" class="flex items-center gap-xs px-sm py-xs rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-label-sm font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Backend Online</span>
+                </div>
+                <button id="btn-clear-session" class="text-body-sm text-outline hover:text-error transition-colors flex items-center gap-xs cursor-pointer font-semibold">
+                    <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+                    Clear Session
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-container-max mx-auto px-gutter md:px-lg py-lg md:py-xl flex flex-col gap-xl">
+        <!-- Hero Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-center">
+            <div class="lg:col-span-7 flex flex-col gap-sm">
+                <h2 class="text-display-lg font-display-lg text-on-surface">AI-Powered <br /><span
+                        class="text-primary">Medical Document</span> Analyzer</h2>
+                <p class="text-body-lg font-body-lg text-on-surface-variant max-w-2xl mt-sm">
+                    Upload your clinical notes, prescriptions, or lab results. Our advanced neural extraction engine
+                    translates complex medical jargon into clear, actionable insights in seconds.
+                </p>
+            </div>
+            <div
+                class="lg:col-span-5 relative h-64 md:h-80 w-full rounded-xl overflow-hidden shadow-ambient-lg border border-surface-container-high">
+                <img class="w-full h-full object-cover"
+                    data-alt="A clean, minimalist 3D rendering of a futuristic medical digital clipboard floating in a bright, white clinical space. The clipboard displays glowing blue and cyan medical symbols and subtle data visualization charts. Soft ambient lighting creates a premium, high-tech SaaS aesthetic with deep shadows and soft highlights, conveying trust and precision."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgi_t1rIovIQMn4lbK89-KrmBfrsd6NySW8sHLjJhnTRywqBlqt5VWeht0zxmlVT8C6erPjSaAhVf9Xxpsl0KJfoaZkcdFmvxwoyHuUVkQo2jiFEv3HDxfwggyEITMjKnuq0OJyvm24h6cxx3_1OCLhODpgrCsKXU4j80rnDQk3WuIVuWVWSqmUrmKd0mc-Di1JkzuZCyil759yXQC8xKyB2mnXL6Z3FJF5q1kqvHurMz-7xGb0M_aYQ" />
+            </div>
+        </section>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+            <!-- Left Column: Upload & Progress -->
+            <div class="lg:col-span-5 flex flex-col gap-lg">
+                <!-- Upload Card -->
+                <div
+                    class="bg-surface-container-lowest rounded-[16px] shadow-ambient-md p-lg flex flex-col gap-md transition-shadow hover:shadow-ambient-lg border border-surface-container-low">
+                    <h3 class="text-headline-md font-headline-md text-on-surface">Upload Document</h3>
+                    <div class="upload-dashed p-xl flex flex-col items-center justify-center text-center cursor-pointer bg-surface-bright transition-colors hover:bg-surface-container-low group">
+    <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" />
+    <span class="material-symbols-outlined text-[48px] text-primary-fixed-dim group-hover:text-primary transition-colors mb-sm">upload_file</span>
+                        <p class="text-body-lg font-body-lg font-medium text-on-surface">Drag &amp; Drop</p>
+                        <p class="text-body-sm font-body-sm text-on-surface-variant mt-xs">PDF, JPG, PNG up to 10MB</p>
+                    </div>
+                    <button
+                        class="bg-primary text-on-primary py-[12px] px-[24px] rounded-lg text-label-md font-label-md hover:opacity-90 transition-opacity flex items-center justify-center gap-xs shadow-sm">
+                        <span class="material-symbols-outlined text-[20px]">analytics</span>
+                        Analyze Document
+                    </button>
+                </div>
+                <!-- Animated Progress Timeline -->
+                <div
+                    class="bg-surface-container-lowest rounded-[16px] shadow-ambient-md p-lg flex flex-col gap-md border border-surface-container-low">
+                    <h4 class="text-label-md font-label-md text-on-surface uppercase tracking-widest text-outline">
+                        Analysis Progress</h4>
+                    <div class="flex flex-col relative pl-md">
+                        <!-- Vertical Line -->
+                        <div class="absolute left-[27px] top-4 bottom-4 w-[2px] bg-surface-container-highest z-0"></div>
+                        <!-- Step 1: Complete -->
+                        <div class="flex items-start gap-md py-sm relative z-10">
+                            <div
+                                class="w-6 h-6 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center mt-1 shrink-0">
+                                <span class="material-symbols-outlined text-[14px]"
+                                    style="font-variation-settings: 'FILL' 1;">check</span>
+                            </div>
+                            <div>
+                                <p class="text-body-md font-body-md font-medium text-on-surface">Upload Complete</p>
+                                <p class="text-body-sm font-body-sm text-on-surface-variant">Document received successfully</p>
+                            </div>
+                        </div>
+                        <!-- Step 2: Document Parsing -->
+                        <div class="flex items-start gap-md py-sm relative z-10">
+                            <div
+                                class="w-6 h-6 rounded-full bg-surface-container-lowest border-2 border-outline-variant flex items-center justify-center mt-1 shrink-0">
+                                <span
+                                    class="material-symbols-outlined text-[14px] text-outline-variant">hourglass_empty</span>
+                            </div>
+                            <div>
+                                <p class="text-body-md font-body-md text-outline">Document Parsing</p>
+                                <p class="text-body-sm font-body-sm text-on-surface-variant">PyMuPDF text & image encoding</p>
+                            </div>
+                        </div>
+                        <!-- Step 3: Multimodal AI Vision -->
+                        <div class="flex items-start gap-md py-sm relative z-10">
+                            <div
+                                class="w-6 h-6 rounded-full bg-surface-container-lowest border-2 border-outline-variant flex items-center justify-center mt-1 shrink-0">
+                                <span
+                                    class="material-symbols-outlined text-[14px] text-outline-variant">hourglass_empty</span>
+                            </div>
+                            <div>
+                                <p class="text-body-md font-body-md text-outline">Multimodal AI Vision</p>
+                                <p class="text-body-sm font-body-sm text-on-surface-variant">Gemini 2.5 Flash neural extraction</p>
+                            </div>
+                        </div>
+                        <!-- Step 4: AI Summary & RAG Indexing -->
+                        <div class="flex items-start gap-md py-sm relative z-10">
+                            <div
+                                class="w-6 h-6 rounded-full bg-surface-container-lowest border-2 border-outline-variant flex items-center justify-center mt-1 shrink-0">
+                                <span
+                                    class="material-symbols-outlined text-[14px] text-outline-variant">hourglass_empty</span>
+                            </div>
+                            <div>
+                                <p class="text-body-md font-body-md text-outline">AI Summary & RAG Indexing</p>
+                                <p class="text-body-sm font-body-sm text-on-surface-variant">Structured summary & vector storage</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Column: Results & Chat -->
+            <div class="lg:col-span-7 flex flex-col gap-lg">
+                <!-- AI Medical Summary -->
+                <div
+                    class="bg-surface-container-lowest rounded-[16px] shadow-ambient-md p-lg border border-primary-fixed flex flex-col h-full min-h-[400px]">
+                    <div
+                        class="flex items-center justify-between mb-md pb-md border-b border-surface-container-highest">
+                        <div class="flex items-center gap-xs text-primary">
+                            <span class="material-symbols-outlined">summarize</span>
+                            <h3 class="text-headline-md font-headline-md font-semibold">AI Medical Summary</h3>
+                        </div>
+                        <span
+                            class="bg-surface-container px-sm py-xs rounded-full text-label-sm font-label-sm text-primary">Draft</span>
+                    </div>
+                    <div class="flex-grow flex flex-col justify-center items-center text-center p-xl">
+                        <div
+                            class="w-24 h-24 rounded-full bg-surface-container-low flex items-center justify-center mb-md">
+                            <span
+                                class="material-symbols-outlined text-[48px] text-primary-fixed-dim">document_scanner</span>
+                        </div>
+                        <h4 class="text-body-lg font-body-lg font-medium text-on-surface mb-xs">No Document Analyzed Yet
+                        </h4>
+                        <p class="text-body-sm font-body-sm text-on-surface-variant max-w-sm">
+                            Upload a medical document to generate a patient-friendly summary, extract key entities, and
+                            ask questions.
+                        </p>
+                    </div>
+                </div>
+                <!-- AI Chat Section -->
+                <div class="bg-surface-container-lowest rounded-[16px] shadow-ambient-md border border-surface-container-low flex flex-col min-h-[720px] h-[720px] overflow-hidden">
+                    <!-- Clean Brand Header -->
+                    <div class="bg-surface px-lg py-md border-b border-surface-container-highest flex items-center justify-between">
+                        <div class="flex items-center gap-xs">
+                            <span class="material-symbols-outlined text-primary text-[24px]">smart_toy</span>
+                            <h4 class="text-headline-sm font-bold text-on-surface">MediGuru Assistant</h4>
+                        </div>
+                        <span class="bg-primary/10 text-primary px-sm py-xs rounded-full text-label-sm font-semibold border border-primary/20 flex items-center gap-xs">
+                            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                            RAG Search Active
+                        </span>
+                    </div>
+                    
+                    <!-- Chat Messages Scroll Area with Custom Scrollbar & Bottom Spacing -->
+                    <div id="chat-scroll-area" class="flex-1 min-h-[460px] p-lg pb-xl flex flex-col justify-start bg-surface-bright overflow-y-auto custom-scrollbar">
+                        <div id="chat-messages-list" class="flex flex-col gap-md">
+                            <!-- AI Welcome Message -->
+                            <div class="flex gap-sm">
+                                <div class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+                                    <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+                                </div>
+                                <div class="bg-surface-container-lowest border border-surface-container-high text-on-surface px-md py-sm rounded-2xl rounded-tl-xs max-w-[85%] text-body-md shadow-sm">
+                                    Hello! Once you upload a document, I can help explain your diagnosis, summarize prescriptions, or answer any medical questions you have about the text.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Input & Prompt Suggestion Area -->
+                    <div class="p-md bg-surface-container-lowest border-t border-surface-container-highest flex flex-col gap-sm">
+                        <!-- Suggestion Chips -->
+                        <div id="suggestion-chips-container" class="flex flex-wrap gap-xs">
+                            <button class="suggestion-chip bg-surface-container text-on-surface-variant hover:bg-surface-variant hover:text-on-surface px-sm py-xs rounded-full text-label-sm font-label-sm transition-colors border border-outline-variant">Explain my diagnosis</button>
+                            <button class="suggestion-chip bg-surface-container text-on-surface-variant hover:bg-surface-variant hover:text-on-surface px-sm py-xs rounded-full text-label-sm font-label-sm transition-colors border border-outline-variant">Summarize prescription</button>
+                        </div>
+                        <form id="chat-form" class="relative flex items-center">
+                            <input id="chat-input" class="w-full bg-surface-bright border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl py-md pl-md pr-[60px] text-body-md text-on-surface placeholder:text-outline outline-none transition-all" placeholder="Ask anything..." type="text" />
+                            <button type="submit" id="btn-send-chat" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-primary text-on-primary rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm">
+                                <span class="material-symbols-outlined text-[20px]">send</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer
+        class="bg-background dark:bg-on-surface border-t border-outline-variant dark:border-outline mt-auto full-width py-xl">
+        <div class="max-w-container-max mx-auto px-lg flex flex-col md:flex-row justify-between items-center gap-md">
+            <div class="flex items-center gap-xs">
+                <span class="font-bold text-primary text-label-md font-label-md">MediGuru</span>
+                <span class="text-body-sm font-body-sm text-on-surface-variant dark:text-outline-variant">© 2024
+                    MediGuru AI. Built with Advanced Neural Extraction.</span>
+            </div>
+            <div class="flex items-center gap-md text-body-sm font-body-sm text-on-surface-variant">
+                <span class="text-label-sm font-label-sm uppercase tracking-wider text-outline">Powered By:</span>
+                <span class="flex items-center gap-xs"><span
+                        class="w-2 h-2 rounded-full bg-primary"></span>Streamlit</span>
+                <span class="flex items-center gap-xs"><span
+                        class="w-2 h-2 rounded-full bg-[#009688]"></span>FastAPI</span>
+                <span class="flex items-center gap-xs"><span class="w-2 h-2 rounded-full bg-[#8E24AA]"></span>Gemini
+                    AI</span>
+            </div>
+            <nav class="flex gap-md">
+                <a class="text-body-sm font-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline transition-all duration-200"
+                    href="#">Documentation</a>
+                <a class="text-body-sm font-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline transition-all duration-200"
+                    href="#">Privacy Policy</a>
+                <a class="text-body-sm font-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline transition-all duration-200"
+                    href="#">Security Compliance</a>
+            </nav>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+
+</html>

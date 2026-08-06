@@ -21,6 +21,7 @@ class MedicalExtraction(BaseModel):
     lab_values: Optional[str] = Field(None, description="Extracted lab values or test results")
     diagnosis: Optional[str] = Field(None, description="Diagnosis, symptoms, or medical condition mentioned")
     follow_up_instructions: Optional[str] = Field(None, description="Follow-up details or next appointments")
+    summary: Optional[str] = Field(None, description="Clear, patient-friendly summary of condition, active prescriptions, lab results, and follow-up plan")
 
     model_config = ConfigDict(from_attributes=True)
 
