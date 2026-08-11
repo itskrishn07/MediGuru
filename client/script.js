@@ -1,5 +1,9 @@
-// MediGuru Vanilla JS Client - Binds directly to index.html / code.html UI
-const API_BASE = "http://localhost:8000";
+// MediGuru Vanilla JS Client - Binds directly to index.html UI
+const API_BASE = (window.ENV && window.ENV.API_BASE_URL && window.ENV.API_BASE_URL !== "http://localhost:8000")
+    ? window.ENV.API_BASE_URL
+    : ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+        ? "http://localhost:8000"
+        : "https://mediguru-backend.onrender.com");
 
 let selectedFile = null;
 let currentReportData = null;
@@ -215,19 +219,43 @@ function renderSummaryCardResults(data) {
     const summaryCard = document.querySelector(".bg-surface-container-lowest.border-primary-fixed");
     if (!summaryCard) return;
 
-    // Update Draft Badge to Processed
-    const badge = summaryCard.querySelector("span.bg-surface-container");
+    const ext = data.extracted_data || {};
+    const isMedical = ext.is_medical_document !== false;
+
+    // Update Draft Badge
+    const badge = summaryCard.querySelector("span.bg-surface-container, span.bg-emerald-50, span.bg-amber-50");
     if (badge) {
-        badge.className = "bg-emerald-50 text-emerald-600 px-sm py-xs rounded-full text-label-sm font-label-sm font-semibold border border-emerald-200";
-        badge.textContent = "Processed";
+        if (isMedical) {
+            badge.className = "bg-emerald-50 text-emerald-600 px-sm py-xs rounded-full text-label-sm font-label-sm font-semibold border border-emerald-200";
+            badge.textContent = "Processed";
+        } else {
+            badge.className = "bg-amber-50 text-amber-700 px-sm py-xs rounded-full text-label-sm font-label-sm font-semibold border border-amber-200";
+            badge.textContent = "Invalid Document";
+        }
     }
 
     // Replace empty state with results content
     const emptyState = summaryCard.querySelector(".flex-grow.flex.flex-col");
     if (emptyState) {
-        const ext = data.extracted_data || {};
+        if (!isMedical) {
+            emptyState.className = "flex-grow flex flex-col gap-md p-md text-left overflow-y-auto";
+            emptyState.innerHTML = `
+                <div class="bg-amber-50 border border-amber-200 text-amber-900 p-md rounded-xl flex items-start gap-md shadow-sm">
+                    <span class="material-symbols-outlined text-amber-600 text-[28px] shrink-0 mt-0.5">warning</span>
+                    <div>
+                        <h5 class="text-body-lg font-bold text-amber-900 mb-xs">Non-Medical Document Detected</h5>
+                        <p class="text-body-md text-amber-800 leading-relaxed">${escapeHtml(data.summary)}</p>
+                    </div>
+                </div>
+                <div class="p-md bg-surface-bright border border-outline-variant rounded-xl text-center text-on-surface-variant text-body-sm">
+                    <p>MediGuru only processes clinical documents (prescriptions, lab reports, discharge summaries, etc.).</p>
+                    <p class="mt-xs text-primary font-semibold">Please upload a valid medical report or prescription image.</p>
+                </div>
+            `;
+            return;
+        }
+
         const summaryText = data.summary || "Medical summary extracted successfully.";
-        
         let medicinesHtml = "";
         if (ext.medicines && ext.medicines.length > 0) {
             medicinesHtml = ext.medicines.map(m => `

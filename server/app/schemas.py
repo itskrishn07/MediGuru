@@ -15,13 +15,14 @@ class Medicine(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class MedicalExtraction(BaseModel):
+    is_medical_document: bool = Field(True, description="True if the document is a medical report, prescription, lab test, or health record. False if non-medical (receipt, landscape, invoice, non-medical file).")
     patient_name: Optional[str] = Field(None, description="Name of the patient, if present")
     doctor_name: Optional[str] = Field(None, description="Name of the doctor/physician, if present")
     medicines: List[Medicine] = Field(default_factory=list, description="List of prescribed medicines with details")
     lab_values: Optional[str] = Field(None, description="Extracted lab values or test results")
     diagnosis: Optional[str] = Field(None, description="Diagnosis, symptoms, or medical condition mentioned")
     follow_up_instructions: Optional[str] = Field(None, description="Follow-up details or next appointments")
-    summary: Optional[str] = Field(None, description="Clear, patient-friendly summary of condition, active prescriptions, lab results, and follow-up plan")
+    summary: Optional[str] = Field(None, description="Clear summary. If non-medical, explain that the document is not a medical report.")
 
     model_config = ConfigDict(from_attributes=True)
 

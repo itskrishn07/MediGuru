@@ -41,8 +41,8 @@ def process_document(file_path: Path, content_type: str) -> Dict[str, Any]:
     """
     Ultra-fast MVP document processing using Gemini Multimodal Vision in ONE unified API call:
     1. Checks PDF for native text (0.05s).
-    2. Uses Gemini Vision for structured data + summary in 1 call (1.8s).
-    3. Indexes vectors in ChromaDB (0.5s).
+    2. Uses Gemini Vision for structured data + validation + summary in 1 call (1.8s).
+    3. If valid medical document, indexes vectors in ChromaDB (0.5s).
     """
     start_total = time.perf_counter()
     suffix = file_path.suffix.lower()
@@ -102,6 +102,9 @@ def process_document(file_path: Path, content_type: str) -> Dict[str, Any]:
         except Exception:
             pass
 
+    # Check non-medical document validation
+    is_valid_medical = extracted_data.is_medical_document
+
     # Construct text for ChromaDB vector store
     if not extracted_text:
         text_parts = []
@@ -114,35 +117,39 @@ def process_document(file_path: Path, content_type: str) -> Dict[str, Any]:
             med_list = [f"{m.medicine_name} {m.strength or ''} ({m.dosage or ''}, {m.frequency or ''}, {m.food_instruction or ''})" for m in extracted_data.medicines]
             text_parts.append("Medicines Prescribed:\n" + "\n".join(med_list))
         
-        extracted_text = "\n\n".join(text_parts) if text_parts else "Medical document processed via Gemini AI."
+        extracted_text = "\n\n".join(text_parts) if text_parts else ("Medical document processed via Gemini AI." if is_valid_medical else "Non-medical document uploaded.")
 
-    # Determine Summary (Prioritize single-call summary or fallback)
+    # Determine Summary
     if rate_limit_error:
         summary = rate_limit_error
+    elif not is_valid_medical:
+        summary = extracted_data.summary or "The uploaded document does not appear to be a medical report, prescription, or health record. Please upload a valid medical document."
     elif extracted_data.summary and len(extracted_data.summary.strip()) > 10:
         summary = extracted_data.summary
     else:
-        # Fallback to secondary summary call only if needed
         try:
             summary = summarize_document(extracted_text)
         except Exception as sum_err:
             logger.error(f"Summary fallback notice: {sum_err}")
             summary = "Medical summary complete."
 
-    # Step 3: Indexing Vectors in ChromaDB
+    # Step 3: Indexing Vectors in ChromaDB (Only if valid medical document)
     t3 = time.perf_counter()
     indexed_in_chroma = False
-    doc_id = str(uuid.uuid4())
-    try:
-        logger.info(f"[3/3] Indexing document in temporary ChromaDB...")
-        indexed_in_chroma = index_document(
-            doc_id=doc_id,
-            filename=file_path.name,
-            text=extracted_text
-        )
-    except Exception as vec_err:
-        logger.error(f"Vector indexing error: {vec_err}")
-    logger.info(f"[3/3] ChromaDB indexing complete in {time.perf_counter() - t3:.2f}s")
+    if is_valid_medical and not rate_limit_error:
+        doc_id = str(uuid.uuid4())
+        try:
+            logger.info(f"[3/3] Indexing document in temporary ChromaDB...")
+            indexed_in_chroma = index_document(
+                doc_id=doc_id,
+                filename=file_path.name,
+                text=extracted_text
+            )
+        except Exception as vec_err:
+            logger.error(f"Vector indexing error: {vec_err}")
+        logger.info(f"[3/3] ChromaDB indexing complete in {time.perf_counter() - t3:.2f}s")
+    else:
+        logger.info("[3/3] Non-medical document or rate limit detected. Skipping ChromaDB vector indexing.")
 
     total_duration = time.perf_counter() - start_total
     logger.info(f"⚡ COMPLETE! Processed '{file_path.name}' in {total_duration:.2f} seconds ⚡")

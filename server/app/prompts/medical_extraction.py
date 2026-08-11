@@ -1,15 +1,18 @@
-# Prompt templates for different medical extraction tasks
+# Prompt templates for medical document extraction and validation
 
 PRESCRIPTION_PROMPT = (
-    "Extract structured medical information from the provided prescription, image, or medical document.\n\n"
-    "Follow these strict instructions:\n"
-    "- Never invent medicines. Only extract what is explicitly present in the document.\n"
-    "- Return null for any field if the corresponding information is missing from the document.\n"
-    "- Preserve medicine names exactly as written (including typos and OCR errors).\n"
-    "- Don't normalize unknown abbreviations.\n"
-    "- Return only valid JSON adhering to the specified schema.\n"
-    "- Ignore logos, advertisements, and decorative text.\n"
-    "- Assign a confidence score (float between 0.0 and 1.0) for each medicine entry, indicating your confidence in the correctness and accuracy of the extraction for that item."
+    "Analyze the provided image or document and perform medical extraction.\n\n"
+    "Step 1: Check if the document is medical-related (doctor prescription, lab report, discharge summary, clinical note, health bill).\n"
+    "If the document is NOT medical-related (e.g. random photo, grocery receipt, invoice, landscape, book page, code snippet):\n"
+    "- Set is_medical_document to false.\n"
+    "- Set summary to 'The uploaded file does not appear to be a medical report, prescription, or health record. Please upload a valid medical document.'\n"
+    "- Leave patient_name, doctor_name, diagnosis, lab_values, and medicines empty/null.\n\n"
+    "Step 2: If the document IS medical-related:\n"
+    "- Set is_medical_document to true.\n"
+    "- Extract patient name, doctor name, diagnosis, lab results, follow-up instructions, and active medicines.\n"
+    "- Never invent medicines or diagnoses. Extract only what is explicitly present.\n"
+    "- Preserve medicine names exactly as written.\n"
+    "- Provide a clear, patient-friendly summary."
 )
 
 LAB_REPORT_PROMPT = (

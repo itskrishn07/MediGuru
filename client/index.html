@@ -149,14 +149,17 @@
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 9999px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 9999px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
@@ -181,11 +184,13 @@
                     MediGuru</h1>
             </div>
             <div class="flex items-center gap-md">
-                <div id="backend-status" class="flex items-center gap-xs px-sm py-xs rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-label-sm font-semibold">
+                <div id="backend-status"
+                    class="flex items-center gap-xs px-sm py-xs rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-label-sm font-semibold">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span>Backend Online</span>
                 </div>
-                <button id="btn-clear-session" class="text-body-sm text-outline hover:text-error transition-colors flex items-center gap-xs cursor-pointer font-semibold">
+                <button id="btn-clear-session"
+                    class="text-body-sm text-outline hover:text-error transition-colors flex items-center gap-xs cursor-pointer font-semibold">
                     <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
                     Clear Session
                 </button>
@@ -218,9 +223,11 @@
                 <div
                     class="bg-surface-container-lowest rounded-[16px] shadow-ambient-md p-lg flex flex-col gap-md transition-shadow hover:shadow-ambient-lg border border-surface-container-low">
                     <h3 class="text-headline-md font-headline-md text-on-surface">Upload Document</h3>
-                    <div class="upload-dashed p-xl flex flex-col items-center justify-center text-center cursor-pointer bg-surface-bright transition-colors hover:bg-surface-container-low group">
-    <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" />
-    <span class="material-symbols-outlined text-[48px] text-primary-fixed-dim group-hover:text-primary transition-colors mb-sm">upload_file</span>
+                    <div
+                        class="upload-dashed p-xl flex flex-col items-center justify-center text-center cursor-pointer bg-surface-bright transition-colors hover:bg-surface-container-low group">
+                        <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" />
+                        <span
+                            class="material-symbols-outlined text-[48px] text-primary-fixed-dim group-hover:text-primary transition-colors mb-sm">upload_file</span>
                         <p class="text-body-lg font-body-lg font-medium text-on-surface">Drag &amp; Drop</p>
                         <p class="text-body-sm font-body-sm text-on-surface-variant mt-xs">PDF, JPG, PNG up to 10MB</p>
                     </div>
@@ -247,7 +254,8 @@
                             </div>
                             <div>
                                 <p class="text-body-md font-body-md font-medium text-on-surface">Upload Complete</p>
-                                <p class="text-body-sm font-body-sm text-on-surface-variant">Document received successfully</p>
+                                <p class="text-body-sm font-body-sm text-on-surface-variant">Document received
+                                    successfully</p>
                             </div>
                         </div>
                         <!-- Step 2: Document Parsing -->
@@ -259,7 +267,8 @@
                             </div>
                             <div>
                                 <p class="text-body-md font-body-md text-outline">Document Parsing</p>
-                                <p class="text-body-sm font-body-sm text-on-surface-variant">PyMuPDF text & image encoding</p>
+                                <p class="text-body-sm font-body-sm text-on-surface-variant">PyMuPDF text & image
+                                    encoding</p>
                             </div>
                         </div>
                         <!-- Step 3: Multimodal AI Vision -->
@@ -271,7 +280,8 @@
                             </div>
                             <div>
                                 <p class="text-body-md font-body-md text-outline">Multimodal AI Vision</p>
-                                <p class="text-body-sm font-body-sm text-on-surface-variant">Gemini 2.5 Flash neural extraction</p>
+                                <p class="text-body-sm font-body-sm text-on-surface-variant">Gemini 2.5 Flash neural
+                                    extraction</p>
                             </div>
                         </div>
                         <!-- Step 4: AI Summary & RAG Indexing -->
@@ -283,7 +293,8 @@
                             </div>
                             <div>
                                 <p class="text-body-md font-body-md text-outline">AI Summary & RAG Indexing</p>
-                                <p class="text-body-sm font-body-sm text-on-surface-variant">Structured summary & vector storage</p>
+                                <p class="text-body-sm font-body-sm text-on-surface-variant">Structured summary & vector
+                                    storage</p>
                             </div>
                         </div>
                     </div>
@@ -318,49 +329,65 @@
                     </div>
                 </div>
                 <!-- AI Chat Section -->
-                <div class="bg-surface-container-lowest rounded-[16px] shadow-ambient-md border border-surface-container-low flex flex-col min-h-[720px] h-[720px] overflow-hidden">
+                <div
+                    class="bg-surface-container-lowest rounded-[16px] shadow-ambient-md border border-surface-container-low flex flex-col min-h-[720px] h-[720px] overflow-hidden">
                     <!-- Clean Brand Header -->
-                    <div class="bg-surface px-lg py-md border-b border-surface-container-highest flex items-center justify-between">
+                    <div
+                        class="bg-surface px-lg py-md border-b border-surface-container-highest flex items-center justify-between">
                         <div class="flex items-center gap-xs">
                             <span class="material-symbols-outlined text-primary text-[24px]">smart_toy</span>
                             <h4 class="text-headline-sm font-bold text-on-surface">MediGuru Assistant</h4>
                         </div>
-                        <span class="bg-primary/10 text-primary px-sm py-xs rounded-full text-label-sm font-semibold border border-primary/20 flex items-center gap-xs">
+                        <span
+                            class="bg-primary/10 text-primary px-sm py-xs rounded-full text-label-sm font-semibold border border-primary/20 flex items-center gap-xs">
                             <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
                             RAG Search Active
                         </span>
                     </div>
-                    
+
                     <!-- Chat Messages Scroll Area with Custom Scrollbar & Bottom Spacing -->
-                    <div id="chat-scroll-area" class="flex-1 min-h-[460px] p-lg pb-xl flex flex-col justify-start bg-surface-bright overflow-y-auto custom-scrollbar">
+                    <div id="chat-scroll-area"
+                        class="flex-1 min-h-[200px] max-h-[400px] p-lg pb-xl flex flex-col justify-start bg-surface-bright overflow-y-auto custom-scrollbar">
                         <div id="chat-messages-list" class="flex flex-col gap-md">
                             <!-- AI Welcome Message -->
                             <div class="flex gap-sm">
-                                <div class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+                                <div
+                                    class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm">
                                     <span class="material-symbols-outlined text-[18px]">smart_toy</span>
                                 </div>
-                                <div class="bg-surface-container-lowest border border-surface-container-high text-on-surface px-md py-sm rounded-2xl rounded-tl-xs max-w-[85%] text-body-md shadow-sm">
-                                    Hello! Once you upload a document, I can help explain your diagnosis, summarize prescriptions, or answer any medical questions you have about the text.
+                                <div
+                                    class="bg-surface-container-lowest border border-surface-container-high text-on-surface px-md py-sm rounded-2xl rounded-tl-xs max-w-[85%] text-body-md shadow-sm">
+                                    Hello! Once you upload a document, I can help explain your diagnosis, summarize
+                                    prescriptions, or answer any medical questions you have about the text.
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Input & Prompt Suggestion Area -->
-                    <div class="p-md bg-surface-container-lowest border-t border-surface-container-highest flex flex-col gap-sm">
+                    <div
+                        class="p-md bg-surface-container-lowest border-t border-surface-container-highest flex flex-col gap-sm">
                         <!-- Suggestion Chips -->
                         <div id="suggestion-chips-container" class="flex flex-wrap gap-xs">
-                            <button class="suggestion-chip bg-surface-container text-on-surface-variant hover:bg-surface-variant hover:text-on-surface px-sm py-xs rounded-full text-label-sm font-label-sm transition-colors border border-outline-variant">Explain my diagnosis</button>
-                            <button class="suggestion-chip bg-surface-container text-on-surface-variant hover:bg-surface-variant hover:text-on-surface px-sm py-xs rounded-full text-label-sm font-label-sm transition-colors border border-outline-variant">Summarize prescription</button>
+                            <button
+                                class="suggestion-chip bg-surface-container text-on-surface-variant hover:bg-surface-variant hover:text-on-surface px-sm py-xs rounded-full text-label-sm font-label-sm transition-colors border border-outline-variant">Explain
+                                my diagnosis</button>
+                            <button
+                                class="suggestion-chip bg-surface-container text-on-surface-variant hover:bg-surface-variant hover:text-on-surface px-sm py-xs rounded-full text-label-sm font-label-sm transition-colors border border-outline-variant">Summarize
+                                prescription</button>
                         </div>
                         <form id="chat-form" class="relative flex items-center">
-                            <input id="chat-input" class="w-full bg-surface-bright border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl py-md pl-md pr-[60px] text-body-md text-on-surface placeholder:text-outline outline-none transition-all" placeholder="Ask anything..." type="text" />
-                            <button type="submit" id="btn-send-chat" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-primary text-on-primary rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm">
+                            <input id="chat-input"
+                                class="w-full bg-surface-bright border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl py-md pl-md pr-[60px] text-body-md text-on-surface placeholder:text-outline outline-none transition-all"
+                                placeholder="Ask anything..." type="text" />
+                            <button type="submit" id="btn-send-chat"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-primary text-on-primary rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm">
                                 <span class="material-symbols-outlined text-[20px]">send</span>
                             </button>
                         </form>
                         <p class="text-[11px] text-center text-outline mt-[1px]">
-                            MediGuru Assistant provides AI guidance based on your medical records. Consult a physician for medical advice.
+                            MediGuru Assistant provides AI guidance based on your medical records. Consult a physician
+                            for medical advice.
                         </p>
                     </div>
                 </div>
@@ -373,13 +400,12 @@
         <div class="max-w-container-max mx-auto px-lg flex flex-col md:flex-row justify-between items-center gap-md">
             <div class="flex items-center gap-xs">
                 <span class="font-bold text-primary text-label-md font-label-md">MediGuru</span>
-                <span class="text-body-sm font-body-sm text-on-surface-variant dark:text-outline-variant">© 2024
+                <span class="text-body-sm font-body-sm text-on-surface-variant dark:text-outline-variant">© 2026
                     MediGuru AI. Built with Advanced Neural Extraction.</span>
             </div>
             <div class="flex items-center gap-md text-body-sm font-body-sm text-on-surface-variant">
                 <span class="text-label-sm font-label-sm uppercase tracking-wider text-outline">Powered By:</span>
-                <span class="flex items-center gap-xs"><span
-                        class="w-2 h-2 rounded-full bg-primary"></span>Streamlit</span>
+
                 <span class="flex items-center gap-xs"><span
                         class="w-2 h-2 rounded-full bg-[#009688]"></span>FastAPI</span>
                 <span class="flex items-center gap-xs"><span class="w-2 h-2 rounded-full bg-[#8E24AA]"></span>Gemini
@@ -395,6 +421,7 @@
             </nav>
         </div>
     </footer>
+    <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
 
