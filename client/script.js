@@ -277,7 +277,7 @@ function renderSummaryCardResults(data) {
                 ${formatStructuredSummary(summaryText)}
             </div>
 
-            <div class="grid grid-cols-2 gap-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
                 <div class="bg-surface-bright p-sm rounded-lg border border-outline-variant">
                     <p class="text-label-sm text-outline uppercase tracking-wider mb-xs">Patient Name</p>
                     <p class="text-body-md font-semibold text-on-surface">${escapeHtml(ext.patient_name || "Not Specified")}</p>
@@ -290,8 +290,8 @@ function renderSummaryCardResults(data) {
 
             <div class="bg-surface-bright p-sm rounded-lg border border-outline-variant">
                 <p class="text-label-sm text-primary font-semibold mb-xs">Prescribed Medicines:</p>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-body-sm">
+                <div class="overflow-x-auto -mx-1 px-1">
+                    <table class="w-full text-left text-body-sm min-w-[500px]">
                         <thead class="bg-surface-container text-on-surface font-semibold">
                             <tr>
                                 <th class="p-sm">Medicine</th>
@@ -432,7 +432,7 @@ function appendUserBubble(text) {
     const msgDiv = document.createElement("div");
     msgDiv.className = "flex gap-sm justify-end";
     msgDiv.innerHTML = `
-        <div class="bg-primary text-on-primary px-md py-sm rounded-lg rounded-tr-none max-w-[85%] text-body-sm font-body-sm shadow-sm">
+        <div class="bg-primary text-on-primary px-md py-sm rounded-lg rounded-tr-none max-w-[90%] sm:max-w-[85%] text-body-sm font-body-sm shadow-sm">
             ${escapeHtml(text)}
         </div>
     `;
@@ -450,7 +450,7 @@ function appendAssistantBubbleHtml(htmlContent) {
         <div class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm">
             <span class="material-symbols-outlined text-[18px]">smart_toy</span>
         </div>
-        <div class="bg-surface-container-lowest border border-surface-container-high text-on-surface px-md py-sm rounded-2xl rounded-tl-xs max-w-[85%] text-body-md shadow-sm space-y-xs">
+        <div class="bg-surface-container-lowest border border-surface-container-high text-on-surface px-md py-sm rounded-2xl rounded-tl-xs max-w-[90%] sm:max-w-[85%] text-body-md shadow-sm space-y-xs">
             ${htmlContent}
         </div>
     `;
@@ -470,7 +470,7 @@ function appendLoadingBubble() {
         <div class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm">
             <span class="material-symbols-outlined text-[18px] animate-spin">sync</span>
         </div>
-        <div class="bg-surface-container-lowest border border-surface-container-high text-on-surface px-md py-sm rounded-2xl rounded-tl-xs text-body-md shadow-sm">
+        <div class="bg-surface-container-lowest border border-surface-container-high text-on-surface px-md py-sm rounded-2xl rounded-tl-xs max-w-[90%] sm:max-w-[85%] text-body-md shadow-sm">
             Searching document context...
         </div>
     `;
@@ -534,10 +534,10 @@ function initSessionClearControls() {
                 }
                 const emptyState = summaryCard.querySelector(".flex-grow.flex.flex-col");
                 if (emptyState) {
-                    emptyState.className = "flex-grow flex flex-col justify-center items-center text-center p-xl";
+                    emptyState.className = "flex-grow flex flex-col justify-center items-center text-center p-6 sm:p-xl";
                     emptyState.innerHTML = `
-                        <div class="w-24 h-24 rounded-full bg-surface-container-low flex items-center justify-center mb-md">
-                            <span class="material-symbols-outlined text-[48px] text-primary-fixed-dim">document_scanner</span>
+                        <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-surface-container-low flex items-center justify-center mb-md">
+                            <span class="material-symbols-outlined text-[32px] sm:text-[48px] text-primary-fixed-dim">document_scanner</span>
                         </div>
                         <h4 class="text-body-lg font-body-lg font-medium text-on-surface mb-xs">No Document Analyzed Yet</h4>
                         <p class="text-body-sm font-body-sm text-on-surface-variant max-w-sm">
@@ -555,7 +555,7 @@ function initSessionClearControls() {
                         <div class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm">
                             <span class="material-symbols-outlined text-[18px]">smart_toy</span>
                         </div>
-                        <div class="bg-surface-container-lowest border border-surface-container-high text-on-surface px-md py-sm rounded-2xl rounded-tl-xs max-w-[85%] text-body-md shadow-sm">
+                        <div class="bg-surface-container-lowest border border-surface-container-high text-on-surface px-md py-sm rounded-2xl rounded-tl-xs max-w-[90%] sm:max-w-[85%] text-body-md shadow-sm">
                             Hello! Once you upload a document, I can help explain your diagnosis, summarize prescriptions, or answer any medical questions you have about the text.
                         </div>
                     </div>
